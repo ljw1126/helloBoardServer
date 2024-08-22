@@ -1,0 +1,104 @@
+version : "3"
+
+services:
+  mysql_board:
+    image : mysql57:0.0             # custom MySQL(Percona 5.7) image
+    container_name: mysql_board
+    environment :
+      MYSQL_ROOT_PASSWORD: "root"       # set root user password
+      MYSQL_ROOT_HOST : "%"             # allow root access from any host
+      MYSQL_USER : "tester"             # create a new user
+      MYSQL_PASSWORD : "tester123"      # password for the new user
+      MYSQL_DATABASE : "board"          # create a new database
+    ports :
+      - "3306:3306"
+    volumes:
+      - /home/db/data:/var/lib/mysql
+      - /home/db/log:/var/log/mysql
+      - /home/db/conf:/etc/percona-server.conf.d
+    networks:
+      - mybridge
+
+  prom:
+    image: prom/prometheus-linux-amd64
+    container_name: prom
+    hostname: prom
+    ports:
+      - "9090:9090"
+    volumes:
+      - /home/prom/data:/data
+      - /home/prom/conf:/etc/prometheus
+    networks:
+      - mybridge
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    hostname: grafana
+    ports:
+      - "13000:3000"
+    networks:
+      - mybridge
+
+  sonarqube:
+    image: sonarqube:community
+    hostname: sonarqube
+    container_name: sonarqube
+    depends_on:
+      postgresql15:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://postgresql15:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+    ports:
+      - "9000:9000"
+    networks:
+      - mybridge
+
+  postgresql15:
+    image: postgres:15
+    hostname: postgresql15
+    container_name: postgresql15
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+    networks:
+      - mybridge
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U sonar" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  jenkins:
+    image: jenkins/jenkins:jdk17
+    container_name: jenkins
+    ports:
+      - "8090:8080"
+      - "50000:50000"
+    volumes:
+      - /home/jenkins_home:/var/jenkins_home
+    networks:
+      - mybridge
+
+networks:
+  mybridge:
+    driver: bridge
+
+volumes:
+  sonarqube_data:
+  sonarqube_temp:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
