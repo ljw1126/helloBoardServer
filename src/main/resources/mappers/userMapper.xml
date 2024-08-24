@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.board.server.mapper.UserProfileMapper">
+
+    <insert id="register" parameterType="hello.board.server.dto.UserDto">
+        INSERT INTO users (userId, passWord, nickName, isWithDraw, status, isAdmin)
+        VALUES (#{userId}, #{password}, #{nickName}, #{isWithDraw}, #{status}, #{isAdmin})
+    </insert>
+
+    <select id="findByIdAndPassword" resultType="hello.board.server.dto.UserDto">
+        SELECT id,
+               userId,
+               passWord,
+               nickName,
+               createTime,
+               isWithDraw,
+               status
+        FROM users
+        WHERE userId = #{userId}
+          AND password = #{password}
+          AND status != 'DELETED'
+          AND isWithDraw = false
+    </select>
+
+    <select id="idCheck" resultType="int">
+        SELECT COUNT(*)
+        FROM users
+        WHERE userId = #{userId}
+    </select>
+
+    <select id="getUserProfile" resultType="hello.board.server.dto.UserDto">
+        SELECT id,
+               userId,
+               password,
+               nickName,
+               createTime,
+               isWithDraw,
+               status
+        FROM users
+        WHERE userId = #{userId}
+    </select>
+
+    <update id="updatePassword" parameterType="hello.board.server.dto.UserDto">
+        UPDATE users
+        SET password = #{password}
+        WHERE userId = #{userId}
+    </update>
+
+    <delete id="deleteByUserId">
+        DELETE FROM users WHERE userId = #{userId}
+    </delete>
+</mapper>
