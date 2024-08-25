@@ -7,8 +7,6 @@ public interface UserService {
 
     UserDto login(String userId, String password);
 
-    boolean isDuplicatedId(String userId);
-
     UserDto getUserInfo(String userId);
 
     void updatePassword(String userId, String beforePassword, String afterPassword);

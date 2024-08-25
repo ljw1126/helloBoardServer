@@ -2,7 +2,9 @@ package hello.board.server.service.impl;
 
 import hello.board.server.dto.UserDto;
 import hello.board.server.exception.DuplicateIdException;
+import hello.board.server.exception.UserRegistrationFailedException;
 import hello.board.server.mapper.UserProfileMapper;
+import hello.board.server.service.IdChecker;
 import hello.board.server.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -19,15 +21,16 @@ import static hello.board.server.utils.SHA256Util.encrptySHA256;
 public class UserServiceImpl implements UserService {
 
     private final UserProfileMapper userProfileMapper;
+    private final IdChecker idChecker;
 
-    public UserServiceImpl(UserProfileMapper userProfileMapper) {
+    public UserServiceImpl(UserProfileMapper userProfileMapper, IdChecker idChecker) {
         this.userProfileMapper = userProfileMapper;
+        this.idChecker = idChecker;
     }
 
     @Override
     public void register(UserDto userDto) {
-        boolean isDuplicated = isDuplicatedId(userDto.getUserId());
-        if(isDuplicated) {
+        if (idChecker.isDuplicatedId(userDto.getUserId())) {
             throw new DuplicateIdException("중복된 아이디 입니다");
         }
 
@@ -37,12 +40,12 @@ public class UserServiceImpl implements UserService {
         try {
             int insertCount = userProfileMapper.register(userDto);
             if (insertCount != 1) {
-                throw new RuntimeException("register ERROR! 회원가입 메서드를 확인해주세요\n" + "Params : " + userDto);
+                throw new IllegalStateException("register ERROR!\n" + userDto);
             }
         } catch (DataAccessException e) {
-            throw new RuntimeException("Database error occurred during user registration.", e);
+            throw new UserRegistrationFailedException("Database error occurred during user registration.", e);
         } catch (Exception e) {
-            throw new RuntimeException("An unexpected error occurred during user registration.", e);
+            throw new UserRegistrationFailedException("An unexpected error occurred during user registration.", e);
         }
     }
 
@@ -51,12 +54,6 @@ public class UserServiceImpl implements UserService {
     public UserDto login(String userId, String password) {
         String cryptoPassword = encrptySHA256(password);
         return userProfileMapper.findByIdAndPassword(userId, cryptoPassword);
-    }
-
-    @Transactional(readOnly = true)
-    @Override
-    public boolean isDuplicatedId(String userId) {
-        return userProfileMapper.idCheck(userId) == 1;
     }
 
     @Transactional(readOnly = true)
@@ -70,8 +67,8 @@ public class UserServiceImpl implements UserService {
         String cryptoPassword = encrptySHA256(beforePassword);
         UserDto userDto = userProfileMapper.findByIdAndPassword(userId, cryptoPassword);
 
-        if(userDto == null) {
-            throw new IllegalArgumentException("updatePassword ERROR! 비밀번호 변경 메서드를 확인해주세요\n" + "Params : " + userId);
+        if (userDto == null) {
+            throw new IllegalArgumentException("updatePassword ERROR!\n" + userId);
         }
 
         userDto.setPassword(encrptySHA256(afterPassword));
@@ -84,8 +81,8 @@ public class UserServiceImpl implements UserService {
         String cryptoPassword = encrptySHA256(password);
         UserDto userDto = userProfileMapper.findByIdAndPassword(userId, cryptoPassword);
 
-        if(userDto == null) {
-            throw new RuntimeException("deleteId ERROR!\n" + "Params : " + userId);
+        if (userDto == null) {
+            throw new IllegalStateException("deleteId ERROR!\n" + "Params : " + userId);
         }
 
         userProfileMapper.deleteByUserId(userDto.getUserId());

@@ -9,6 +9,9 @@ import java.security.NoSuchAlgorithmException;
 public class SHA256Util {
     public static final String ENCRYPTION_KEY = "SHA-256";
 
+    private SHA256Util() {
+    }
+
     public static String encrptySHA256(String text) {
         MessageDigest messageDigest;
         try {
@@ -16,7 +19,7 @@ public class SHA256Util {
             messageDigest.update(text.getBytes());
             byte[] digested = messageDigest.digest();
             StringBuilder sb = new StringBuilder();
-            for(byte byteData : digested) {
+            for (byte byteData : digested) {
                 sb.append(Integer.toString((byteData & 0xff) + 0x100, 16).substring(1));
             }
 
