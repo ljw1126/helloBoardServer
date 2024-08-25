@@ -67,7 +67,7 @@ class UserProfileMapperTest {
     void idCheck_유일한_아이디면_0을_반환한다() {
         int result = userProfileMapper.idCheck("uniqueUserId");
 
-        assertThat(result).isEqualTo(0);
+        assertThat(result).isZero();
     }
 
     @Test
@@ -115,6 +115,6 @@ class UserProfileMapperTest {
     void deleteByUserId_유저가없으면_0을_반환한다() {
         int count = userProfileMapper.deleteByUserId("unknown");
 
-        assertThat(count).isEqualTo(0);
+        assertThat(count).isZero();
     }
 }
