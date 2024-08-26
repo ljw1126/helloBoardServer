@@ -1,6 +1,7 @@
 package hello.board.server.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import hello.board.server.aop.LoginCheckAspect;
 import hello.board.server.dto.UserDto;
 import hello.board.server.dto.request.DeleteUserRequest;
 import hello.board.server.dto.request.LoginRequest;
@@ -41,6 +42,9 @@ class UserControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private LoginCheckAspect loginCheckAspect;
 
     @MockBean
     private UserService userService;
@@ -133,24 +137,23 @@ class UserControllerTest {
                 jsonPath("$.nickName").value("테스터"));
     }
 
+    /**
+     * spring-aop에서 userId 전달하기 때문에 통합테스트로 다루는게 적합하다 판
+     *
+     * @WebMvcTest 적합하지 않아 null 처리
+     */
     @Test
     void updatePassword() throws Exception {
         doNothing()
                 .when(userService).updatePassword(any(), any(), any());
 
-        // Mock session behavior
-        String userId = "tester";
-        HttpSession session = mock(HttpSession.class);
-        when(SessionUtil.getLoginMemberId(session)).thenReturn(userId);
-
         mockMvc.perform(patch("/users/password")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(new UpdateUserPasswordRequest("test1234", "qwer1234!@#$")))
-                .sessionAttr("LOGIN_MEMBER_ID", userId) // Mock session attribute
         ).andExpectAll(status().isOk(),
                 jsonPath("$").value("Password updated successfully"));
 
-        verify(userService, times(1)).updatePassword(userId, "test1234", "qwer1234!@#$");
+        verify(userService, times(1)).updatePassword(null, "test1234", "qwer1234!@#$");
     }
 
     @Test
