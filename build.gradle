@@ -61,3 +61,8 @@ tasks.jacocoTestReport {
         html.required.set(true)
     }
 }
+
+// SonarQube 분석을 실행하기 전에 JaCoCo 리포트를 먼저 생성하도록 설정
+tasks.named('sonarqube') {
+    dependsOn tasks.named('jacocoTestReport')
+}
