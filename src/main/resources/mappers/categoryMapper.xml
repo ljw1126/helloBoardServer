@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.board.server.mapper.CategoryMapper">
+    <insert id="register" parameterType="hello.board.server.dto.CategoryDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO category (name)
+        VALUES (#{name})
+    </insert>
+
+    <update id="update" parameterType="hello.board.server.dto.CategoryDto">
+        UPDATE category
+        SET name = #{name}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM category WHERE id = #{id}
+    </delete>
+</mapper>
