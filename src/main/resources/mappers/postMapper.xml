@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.board.server.mapper.PostMapper">
+    <insert id="register" parameterType="hello.board.server.dto.PostDto" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO post (name, contents, createTime, views, categoryId, userId)
+        VALUES (#{name}, #{contents}, #{createTime}, #{views}, #{categoryId}, #{userId})
+    </insert>
+
+    <select id="selectByUserId" resultType="hello.board.server.dto.PostDto">
+        SELECT `id`,
+               `name`,
+               `contents`,
+               `categoryId`,
+               `userId`,
+               `createTime`,
+               `updateTime`,
+               `views`
+        FROM `post`
+        WHERE userId = #{userId}
+    </select>
+
+    <select id="selectById" resultType="hello.board.server.dto.PostDto">
+        SELECT `id`,
+               `name`,
+               `contents`,
+               `categoryId`,
+               `userId`,
+               `createTime`,
+               `updateTime`,
+               `views`,
+        FROM `post`
+        WHERE id = #{id}
+    </select>
+
+    <update id="update" parameterType="hello.board.server.dto.PostDto">
+        UPDATE post
+        SET name = #{name},
+            contents = #{contents},
+            categoryId = #{categoryId},
+            updateTime = #{updateTime}
+        WHERE id = #{id}
+        AND userId = #{userId}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM post WHERE id = #{id}
+    </delete>
+</mapper>
