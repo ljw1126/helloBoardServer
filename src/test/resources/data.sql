@@ -10,3 +10,10 @@ CREATE TABLE users
     createTime TIMESTAMP,
     updateTime TIMESTAMP
 );
+
+CREATE TABLE category
+(
+    id       INT AUTO_INCREMENT PRIMARY KEY,
+    name     VARCHAR(45) NOT NULL
+);
+
