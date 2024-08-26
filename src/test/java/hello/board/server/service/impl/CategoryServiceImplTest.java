@@ -13,9 +13,9 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceImplTest {
@@ -28,10 +28,10 @@ class CategoryServiceImplTest {
 
     @Test
     void register() {
-        doNothing()
-                .when(categoryMapper).register(any());
-
         CategoryDto categoryDto = CategoryDto.from(new CategoryRequest(0, "new category"));
+
+        when(categoryMapper.register(any()))
+                .thenReturn(1);
 
         assertThatNoException()
                 .isThrownBy(() -> categoryService.register(categoryDto));
@@ -47,13 +47,14 @@ class CategoryServiceImplTest {
 
     @Test
     void update() {
-        doNothing()
-                .when(categoryMapper).update(any());
+        CategoryDto categoryDto = new CategoryDto();
+        when(categoryMapper.update(categoryDto))
+                .thenReturn(1);
 
         assertThatNoException()
-                .isThrownBy(() -> categoryService.update(new CategoryDto()));
+                .isThrownBy(() -> categoryService.update(categoryDto));
 
-        verify(categoryMapper, times(1)).update(any());
+        verify(categoryMapper, times(1)).update(categoryDto);
     }
 
     @Test
@@ -64,8 +65,8 @@ class CategoryServiceImplTest {
 
     @Test
     void deleteById() {
-        doNothing()
-                .when(categoryMapper).deleteById(anyInt());
+        when(categoryMapper.deleteById(anyInt()))
+                .thenReturn(1);
 
         assertThatNoException()
                 .isThrownBy(() -> categoryService.deleteById(1));
