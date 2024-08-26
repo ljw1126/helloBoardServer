@@ -28,6 +28,7 @@ public class UserDto {
     private String password;
     private String nickName;
     private boolean isAdmin;
+    @Builder.Default
     private Status status = Status.DEFAULT;
     private boolean isWithDraw; // 탈퇴 여부
     private LocalDateTime createTime;
@@ -45,6 +46,6 @@ public class UserDto {
     }
 
     public boolean isAdmin() {
-        return status.isAdmin();
+        return status != null && status.isAdmin();
     }
 }

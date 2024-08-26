@@ -1,5 +1,6 @@
 package hello.board.server.controller;
 
+import hello.board.server.aop.LoginCheck;
 import hello.board.server.dto.UserDto;
 import hello.board.server.dto.request.DeleteUserRequest;
 import hello.board.server.dto.request.LoginRequest;
@@ -80,11 +81,11 @@ public class UserController {
         return ResponseEntity.ok(new UserInfoResponse(userDto));
     }
 
+    @LoginCheck(type = LoginCheck.UserType.USER)
     @PatchMapping("password")
-    public ResponseEntity<String> updatePassword(@RequestBody UpdateUserPasswordRequest updateUserPasswordRequest,
+    public ResponseEntity<String> updatePassword(String userId, @RequestBody UpdateUserPasswordRequest updateUserPasswordRequest,
                                                  HttpSession session) {
         try {
-            String userId = SessionUtil.getLoginMemberId(session);
             String beforePassword = updateUserPasswordRequest.getBeforePassword();
             String afterPassword = updateUserPasswordRequest.getAfterPassword();
 
