@@ -1,6 +1,6 @@
 CREATE TABLE users
 (
-    id         INT AUTO_INCREMENT PRIMARY KEY,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     userId     VARCHAR(45) NOT NULL,
     password   VARCHAR(64) NOT NULL,
     nickname   VARCHAR(45) NOT NULL,
@@ -16,4 +16,17 @@ CREATE TABLE category
     id       INT AUTO_INCREMENT PRIMARY KEY,
     name     VARCHAR(45) NOT NULL
 );
+
+CREATE TABLE post
+(
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name       VARCHAR(45) NOT NULL,
+    contents   VARCHAR(512) NOT NULL,
+    userId     INT NOT NULL,
+    categoryId INT NOT NULL,
+    createTime TIMESTAMP,
+    updateTime TIMESTAMP,
+    views      INT NOT NULL
+);
+
 
