@@ -26,4 +26,10 @@ public class PostSearchController {
         List<PostDto> postDtos = postSearchService.searchPosts(postSearchRequest);
         return ResponseEntity.ok(new PostSearchResponse(postDtos));
     }
+
+    @PostMapping("/cache")
+    public ResponseEntity<PostSearchResponse> searchByCache(@RequestBody PostSearchRequest postSearchRequest) {
+        List<PostDto> postDtos = postSearchService.searchPostsByCache(postSearchRequest);
+        return ResponseEntity.ok(new PostSearchResponse(postDtos));
+    }
 }

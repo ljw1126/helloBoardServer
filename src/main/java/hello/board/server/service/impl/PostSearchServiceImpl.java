@@ -4,6 +4,7 @@ import hello.board.server.dto.PostDto;
 import hello.board.server.dto.request.PostSearchRequest;
 import hello.board.server.mapper.PostSearchMapper;
 import hello.board.server.service.PostSearchService;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,16 @@ public class PostSearchServiceImpl implements PostSearchService {
     @Transactional(readOnly = true)
     @Override
     public List<PostDto> searchPosts(PostSearchRequest postSearchRequest) {
+        return postSearchMapper.searchPosts(postSearchRequest);
+    }
+
+    @Cacheable(value = "posts",
+            key = "'searchPostsByCache' + #postSearchRequest.getName() + #postSearchRequest.getCategoryId()",
+            unless = "#result == null"
+    )
+    @Transactional(readOnly = true)
+    @Override
+    public List<PostDto> searchPostsByCache(PostSearchRequest postSearchRequest) {
         return postSearchMapper.searchPosts(postSearchRequest);
     }
 }

@@ -6,6 +6,7 @@ import hello.board.server.exception.PostDeleteFailedException;
 import hello.board.server.exception.PostUpdateFailedException;
 import hello.board.server.mapper.PostMapper;
 import hello.board.server.service.PostService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class PostServiceImpl implements PostService {
         this.postMapper = postMapper;
     }
 
+    @CacheEvict(value = "posts", allEntries = true)
     @Override
     public void register(long userId, PostRequest postRequest) {
         PostDto postDto = PostDto.of(userId, postRequest);

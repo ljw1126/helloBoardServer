@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PostSearchService {
     List<PostDto> searchPosts(PostSearchRequest postSearchRequest);
+
+    List<PostDto> searchPostsByCache(PostSearchRequest postSearchRequest);
 }
