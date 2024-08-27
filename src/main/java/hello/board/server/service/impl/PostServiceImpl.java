@@ -2,6 +2,8 @@ package hello.board.server.service.impl;
 
 import hello.board.server.dto.PostDto;
 import hello.board.server.dto.request.PostRequest;
+import hello.board.server.exception.PostDeleteFailedException;
+import hello.board.server.exception.PostUpdateFailedException;
 import hello.board.server.mapper.PostMapper;
 import hello.board.server.service.PostService;
 import org.springframework.stereotype.Service;
@@ -40,34 +42,34 @@ public class PostServiceImpl implements PostService {
     public void update(long userId, PostRequest postRequest) {
         PostDto postDto = postMapper.selectById(postRequest.getId());
         if (postDto == null) {
-            throw new IllegalArgumentException("Post not found");
+            throw new PostUpdateFailedException("Post not found");
         }
 
         if (!postDto.validateOwnerShip(userId)) {
-            throw new IllegalStateException("User is not authorized to modify this post : " + userId);
+            throw new PostUpdateFailedException("User is not authorized to modify this post : " + userId);
         }
 
         postDto.updated(postRequest);
         int count = postMapper.update(postDto);
 
         if (count != 1) {
-            throw new IllegalStateException("post update error");
+            throw new PostUpdateFailedException("post update error");
         }
     }
 
     @Override
     public void deleteBy(long userId, long postId) {
-        if (userId < 1 || postId < 1) {
-            throw new IllegalArgumentException("post deleteBy error");
+        if (userId < 1L || postId < 1L) {
+            throw new PostDeleteFailedException("post deleteBy error");
         }
 
         PostDto postDto = postMapper.selectById(postId);
         if (postDto == null) {
-            throw new IllegalArgumentException("Post not found");
+            throw new PostDeleteFailedException("Post not found");
         }
 
         if (!postDto.validateOwnerShip(userId)) {
-            throw new IllegalStateException("User is not authorized to delete this post : " + userId);
+            throw new PostDeleteFailedException("User is not authorized to delete this post : " + userId);
         }
 
         postMapper.deleteById(postId);

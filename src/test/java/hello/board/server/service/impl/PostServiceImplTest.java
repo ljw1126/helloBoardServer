@@ -2,6 +2,8 @@ package hello.board.server.service.impl;
 
 import hello.board.server.dto.PostDto;
 import hello.board.server.dto.request.PostRequest;
+import hello.board.server.exception.PostDeleteFailedException;
+import hello.board.server.exception.PostUpdateFailedException;
 import hello.board.server.mapper.PostMapper;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -57,7 +59,7 @@ class PostServiceImplTest {
                 .isInstanceOf(IllegalStateException.class);
     }
 
-    // TODO. https://www.arhohuttunen.com/test-data-builders/
+    // https://www.arhohuttunen.com/test-data-builders/
     @Test
     void getMyPosts_작성자_키값으로_게시글을_조회한다() {
         long userId = 1L;
@@ -102,8 +104,11 @@ class PostServiceImplTest {
         when(postMapper.selectById(anyLong()))
                 .thenReturn(null);
 
-        assertThatThrownBy(() -> postService.update(99L, new PostRequest()))
-                .isInstanceOf(IllegalArgumentException.class);
+        long userId = 99L;
+        PostRequest postRequest = new PostRequest(2L, "수정된 제목", "수정된 내용", 2);
+        assertThatThrownBy(() -> postService.update(userId, postRequest))
+                .isInstanceOf(PostUpdateFailedException.class)
+                .hasMessage("Post not found");
     }
 
     @Test
@@ -121,8 +126,9 @@ class PostServiceImplTest {
                 .thenReturn(postDto);
 
         long userId = 99L;
-        assertThatThrownBy(() -> postService.update(userId, new PostRequest()))
-                .isInstanceOf(IllegalStateException.class);
+        PostRequest postRequest = new PostRequest(2L, "수정된 제목", "수정된 내용", 2);
+        assertThatThrownBy(() -> postService.update(userId, postRequest))
+                .isInstanceOf(PostUpdateFailedException.class);
     }
 
     @Test
@@ -144,7 +150,7 @@ class PostServiceImplTest {
         long userId = 1L;
         PostRequest postRequest = new PostRequest(2L, "수정된 제목", "수정된 내용", 2);
         assertThatThrownBy(() -> postService.update(userId, postRequest))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(PostUpdateFailedException.class);
     }
 
     @Test
@@ -173,10 +179,13 @@ class PostServiceImplTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"1L, 0L", "0L, 1L"})
-    void 삭제시_유효하지않은_키값이_주어지면_예외를_던진다(String userId, String postId) {
-        assertThatThrownBy(() -> postService.deleteBy(Long.parseLong(userId), Long.parseLong(postId)))
-                .isInstanceOf(IllegalArgumentException.class);
+    @CsvSource(value = {"1, 0", "0, 1"})
+    void 삭제시_유효하지않은_키값이_주어지면_예외를_던진다(String arg1, String arg2) {
+        long userId = Long.parseLong(arg1);
+        long postId = Long.parseLong(arg2);
+
+        assertThatThrownBy(() -> postService.deleteBy(userId, postId))
+                .isInstanceOf(PostDeleteFailedException.class);
     }
 
     @Test
@@ -187,7 +196,7 @@ class PostServiceImplTest {
         long userId = 1L;
         long postId = 99L;
         assertThatThrownBy(() -> postService.deleteBy(userId, postId))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(PostDeleteFailedException.class);
     }
 
     @Test
@@ -207,6 +216,6 @@ class PostServiceImplTest {
         long userId = 99L;
         long postId = 2L;
         assertThatThrownBy(() -> postService.deleteBy(userId, postId))
-                .isInstanceOf(IllegalStateException.class);
+                .isInstanceOf(PostDeleteFailedException.class);
     }
 }

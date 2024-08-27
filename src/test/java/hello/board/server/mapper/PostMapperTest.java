@@ -42,8 +42,8 @@ class PostMapperTest {
     void selectByUserId_게시글이없으면_빈ArrayList를_반환한다() {
         List<PostDto> postDtos = postMapper.selectByUserId(99L);
 
-        assertThat(postDtos).isEmpty();
-        assertThat(postDtos).isInstanceOf(ArrayList.class);
+        assertThat(postDtos).isInstanceOf(ArrayList.class)
+                .isEmpty();
     }
 
     @Test
