@@ -24,11 +24,9 @@
             AND categoryId = #{categoryId}
         </if>
         <if test="sortStatus != null">
-            <if test="sortStatus.toString() == 'NEWEST'">
-                ORDER BY createTime DESC
-            </if>
+            <!-- mysql 5.7 desc 지원 x -->
             <if test="sortStatus.toString() == 'OLDEST'">
-                ORDER BY createTime ASC
+                ORDER BY categoryId, name, createTime
             </if>
             <if test="sortStatus.toString() == 'CATEGORIES'">
                 ORDER BY categoryId
