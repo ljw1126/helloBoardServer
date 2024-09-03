@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PostDto {
+public class PostDto implements Serializable {
+    private static final long serialVersionUID = 987654321L;
+
     private long id;
     private String name;
     private String contents;

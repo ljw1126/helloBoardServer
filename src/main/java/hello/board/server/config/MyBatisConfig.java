@@ -1,10 +1,11 @@
 package hello.board.server.config;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -16,11 +17,15 @@ import javax.sql.DataSource;
 @MapperScan(basePackages = "hello.board.server.mapper")
 public class MyBatisConfig {
 
+    @Bean
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    public HikariConfig hikariConfig() {
+        return new HikariConfig();
+    }
 
     @Bean
-    @ConfigurationProperties(prefix = "spring.datasource")
-    public DataSource dataSource() {
-        return DataSourceBuilder.create().build();
+    public DataSource dataSource(HikariConfig hikariConfig) {
+        return new HikariDataSource(hikariConfig);
     }
 
     @Bean
